@@ -1,0 +1,351 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       url("background.jpg");
+      --surface:  #fffaf0;
+      --row:      rgba(255, 255, 255, 0.72);
+      --text:     #0f172a;
+      --text-sub: #475569;
+      --accent:   #c2410c;
+      --border:   rgba(255, 255, 255, 0.72);
+      --divider:  rgba(15, 23, 42, 0.06);
+      --r:        28px;
+      --r-sm:     20px;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: transparent;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+    }
+    body { padding: 12px; }
+
+    /* ── Container ── */
+    .leaderboard {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+      border-radius: var(--r);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      isolation: isolate;
+    }
+    .leaderboard::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.82)),
+        var(--bg), var(--surface);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    .leaderboard::after {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      z-index: -1;
+      border-radius: calc(var(--r) - 8px);
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      pointer-events: none;
+    }
+
+    /* ── Header ── */
+    .header {
+      padding: 24px 20px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--divider);
+    }
+    .header h2 {
+      color: var(--text);
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ── List ── */
+    #ranking-list {
+      height: calc(100% - 65px);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    /* ── Entry ── */
+    .entry {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 68px;
+      padding: 12px 16px;
+      border-radius: var(--r-sm);
+      background: var(--row);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.48);
+      backdrop-filter: blur(8px);
+    }
+
+    .rank {
+      flex: 0 0 32px;
+      color: var(--text-sub);
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1;
+      text-align: center;
+    }
+    .entry:nth-child(1) .rank { color: #fbbf24; }
+    .entry:nth-child(2) .rank { color: #94a3b8; }
+    .entry:nth-child(3) .rank { color: #b45309; }
+
+    .avatar-frame {
+      flex: 0 0 44px;
+      width: 44px; height: 44px;
+      padding: 3px;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+    }
+    .avatar-frame.is-hidden { display: none; }
+
+    .avatar {
+      width: 100%; height: 100%;
+      display: block;
+      border-radius: 11px;
+      object-fit: cover;
+      background: #e5e7eb;
+    }
+
+    .info { min-width: 0; flex: 1; }
+
+    .name {
+      display: block;
+      color: var(--text);
+      font-size: 24px;
+      font-weight: 850;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .amount {
+      display: block;
+      margin-top: 3px;
+      color: var(--accent);
+      font-size: 16px;
+      font-weight: 750;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .empty {
+      padding: 22px 16px;
+      border-radius: var(--r-sm);
+      background: var(--row);
+      color: var(--text-sub);
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.48);
+    }
+
+    /* ── Mie Ayam ── */
+    .mie-ayam {
+      position: absolute;
+      right: 0; bottom: -56px;
+      width: 245px; height: 215px;
+      z-index: 2;
+      pointer-events: none;
+      animation: ma-enter 850ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+    }
+    .mie-ayam-inner {
+      position: absolute;
+      inset: 0;
+      animation: ma-float 4s ease-in-out infinite;
+      transform-origin: 60% 82%;
+    }
+    .mie-ayam-glow {
+      position: absolute;
+      right: 24px; bottom: 12px;
+      width: 180px; height: 72px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.24), transparent 70%);
+      filter: blur(10px);
+      animation: glow-pulse 3.5s ease-in-out infinite;
+    }
+    .mie-ayam-img {
+      position: absolute;
+      right: 0; bottom: 0;
+      width: 230px; height: auto;
+      display: block;
+      filter: drop-shadow(0 16px 18px rgba(15, 23, 42, 0.18)) saturate(1.04);
+      animation: ma-breathe 4s ease-in-out infinite;
+    }
+    .mie-ayam-effects {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      overflow: visible;
+    }
+
+    .steam {
+      fill: none;
+      stroke: #7c2d12;
+      stroke-width: 3;
+      stroke-linecap: round;
+      opacity: 0;
+      stroke-dasharray: 42;
+      stroke-dashoffset: 42;
+      animation: steam-rise 2.8s ease-in-out infinite;
+    }
+    .steam.two { animation-delay: 0.55s; }
+
+    .heart {
+      transform-origin: center;
+      animation: heart-float 2.6s ease-in-out infinite;
+      filter: drop-shadow(0 5px 8px rgba(239, 68, 68, 0.26));
+    }
+
+    .sparkle { transform-origin: center; animation: sparkle 1.8s ease-in-out infinite; }
+    .sparkle.two   { animation-delay: 0.45s; }
+    .sparkle.three { animation-delay: 0.85s; }
+    .sparkle.four  { animation-delay: 1.15s; }
+
+    /* ── Animations ── */
+    @keyframes ma-enter {
+      from { opacity: 0; transform: translate(34px, 28px) scale(0.82) rotate(4deg); }
+      to   { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+    }
+    @keyframes ma-float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%       { transform: translateY(-7px) rotate(-1deg); }
+    }
+    @keyframes ma-breathe {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.015); }
+    }
+    @keyframes glow-pulse {
+      0%, 100% { opacity: 0.5; transform: scaleX(1); }
+      50%       { opacity: 0.85; transform: scaleX(1.08); }
+    }
+    @keyframes steam-rise {
+      0%   { opacity: 0; stroke-dashoffset: 42; transform: translateY(12px); }
+      35%  { opacity: 0.75; }
+      100% { opacity: 0; stroke-dashoffset: 0; transform: translateY(-16px); }
+    }
+    @keyframes heart-float {
+      0%, 100% { transform: translateY(0) rotate(-8deg) scale(1); }
+      50%       { transform: translateY(-11px) rotate(7deg) scale(1.08); }
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.22; transform: scale(0.7) rotate(0deg); }
+      50%       { opacity: 1; transform: scale(1.18) rotate(18deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="leaderboard">
+    <header class="header">
+      <h2>{{title}}</h2>
+    </header>
+
+    <div id="ranking-list"></div>
+
+    <div class="mie-ayam" aria-hidden="true">
+      <div class="mie-ayam-inner">
+        <div class="mie-ayam-glow"></div>
+        <img class="mie-ayam-img" src="mie-ayam.png" alt="" />
+        <svg class="mie-ayam-effects" viewBox="0 0 245 215" xmlns="http://www.w3.org/2000/svg">
+          <g class="heart">
+            <path d="M62 35 C50 26 39 37 46 50 C52 62 66 65 74 68 C82 57 92 47 84 36 C78 28 69 28 62 35Z"
+                  fill="#ef4444" stroke="#4b1d16" stroke-width="4" stroke-linejoin="round" />
+            <circle cx="77" cy="38" r="3" fill="#fecaca" />
+            <circle cx="80" cy="44" r="2" fill="#fecaca" />
+          </g>
+          <path class="steam" d="M92 88 C79 76 99 69 88 55" />
+          <path class="steam two" d="M112 84 C99 71 118 64 109 49" />
+          <g class="sparkle">
+            <path d="M35 158 L40 169 L51 174 L40 179 L35 190 L30 179 L19 174 L30 169 Z" fill="#fbbf24" />
+          </g>
+          <g class="sparkle two">
+            <path d="M210 116 L214 125 L223 129 L214 133 L210 142 L206 133 L197 129 L206 125 Z" fill="#fbbf24" />
+          </g>
+          <g class="sparkle three">
+            <circle cx="55" cy="120" r="3" fill="#f59e0b" />
+            <circle cx="220" cy="92" r="3" fill="#f59e0b" />
+          </g>
+          <g class="sparkle four">
+            <circle cx="198" cy="174" r="3" fill="#fbbf24" />
+            <circle cx="28" cy="108" r="2.5" fill="#fbbf24" />
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var list = document.getElementById("ranking-list");
+
+      function el(tag, cls) {
+        var e = document.createElement(tag);
+        if (cls) e.className = cls;
+        return e;
+      }
+
+      function buildEntry(r, i) {
+        var pic    = r.picture || "";
+        var entry  = el("div", "entry");
+        var rank   = el("div", "rank");
+        rank.textContent = i + 1;
+
+        var frame  = el("div", "avatar-frame" + (pic ? "" : " is-hidden"));
+        var img    = el("img", "avatar");
+        img.alt    = "";
+        img.src    = pic;
+        img.onerror = function () { this.closest(".avatar-frame").remove(); };
+        frame.appendChild(img);
+
+        var info   = el("div", "info");
+        var name   = el("span", "name");
+        name.textContent = r.name || "Anonymous";
+        var amt    = el("span", "amount");
+        amt.textContent  = r.formattedAmount || "";
+        info.append(name, amt);
+
+        entry.append(rank, frame, info);
+        return entry;
+      }
+
+      try {
+        var data = JSON.parse("{{rankings}}");
+        if (!Array.isArray(data) || !data.length) {
+          var empty = el("div", "empty");
+          empty.textContent = "No rankings yet";
+          list.appendChild(empty);
+        } else {
+          var frag = document.createDocumentFragment();
+          data.forEach(function (r, i) { frag.appendChild(buildEntry(r, i)); });
+          list.appendChild(frag);
+        }
+      } catch (_) {
+        var err = el("div", "empty");
+        err.textContent = "Failed to load leaderboard";
+        list.appendChild(err);
+      }
+    })();
+  </script>
+</body>
+</html>

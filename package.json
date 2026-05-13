@@ -1,0 +1,25 @@
+{
+  "name": "takodotid-overlays",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "bun run build.ts",
+    "dev": "bun run build.ts --dev",
+    "watch": "bun run build.ts --watch",
+    "clean": "bun run build.ts --clean"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/html-minifier-terser": "^7.0.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "html-minifier-terser": "^7.2.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  }
+}
