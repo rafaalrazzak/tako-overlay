@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tako Overlay"
+  short_description: "Build clean Tako custom overlays"
+  default_prompt: "Use $tako-overlay to create or refactor a Tako custom overlay."

@@ -1,9 +1,9 @@
-export function MieAyam() {
+export function MieAyam({ src }: { src: string }) {
   return (
     <div className="mie-ayam" aria-hidden="true">
       <div className="mie-ayam-inner">
         <div className="mie-ayam-glow" />
-        <img className="mie-ayam-img" src="mie-ayam.png" alt="" />
+        <img className="mie-ayam-img" src={src} alt="" />
         <svg className="mie-ayam-effects" viewBox="0 0 245 215" xmlns="http://www.w3.org/2000/svg">
           <g className="heart">
             <path
